@@ -10,12 +10,16 @@ namespace JOIEnergy.Services
         public interface Debug { void Log(string s); };
 
         private readonly List<PricePlan> _pricePlans;
-        private IMeterReadingService _meterReadingService;
+        private readonly IMeterReadingService _meterReadingService;
+        private readonly IAccountService _accountService;
 
-        public PricePlanService(List<PricePlan> pricePlan, IMeterReadingService meterReadingService)
+        public PricePlanService(List<PricePlan> pricePlan,
+                                IMeterReadingService meterReadingService,
+                                IAccountService accountService)
         {
             _pricePlans = pricePlan;
             _meterReadingService = meterReadingService;
+            _accountService = accountService;
         }
 
         private decimal calculateAverageReading(List<ElectricityReading> electricityReadings)
@@ -49,6 +53,19 @@ namespace JOIEnergy.Services
                 return new Dictionary<string, decimal>();
             }
             return _pricePlans.ToDictionary(plan => plan.PlanName, plan => calculateCost(electricityReadings, plan));
+        }
+
+        public decimal GetConsumptionCostLastWeek(string smartMeterId)
+        {
+            var planId = _accountService.GetPricePlanIdForSmartMeterId(smartMeterId);
+            if (planId == null)
+            {
+                throw new ArgumentException("SmartMeterId not found.");
+            }
+
+            var allPlans = GetConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
+
+            return allPlans[planId];
         }
     }
 }

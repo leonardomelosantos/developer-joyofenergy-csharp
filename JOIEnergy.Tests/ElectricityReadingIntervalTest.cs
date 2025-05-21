@@ -4,6 +4,9 @@ using Xunit;
 
 namespace JOIEnergy.Tests
 {
+    /// <summary>
+    /// Classe utilitária que foi fornecida para ajudar na geração de intervalos de leitura de energia elétrica.
+    /// </summary>
     public class ElectricityReadingIntervalTest
     {
         public ElectricityReadingIntervalTest()
