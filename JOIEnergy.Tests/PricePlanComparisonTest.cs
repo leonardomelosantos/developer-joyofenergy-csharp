@@ -14,6 +14,8 @@ namespace JOIEnergy.Tests
     public class PricePlanComparisonTest
     {
         private MeterReadingService meterReadingService;
+        private PricePlanService _pricePlanService;
+
         private PricePlanComparatorController controller;
 
         private static string PRICE_PLAN_1_ID = "test-supplier";
@@ -30,13 +32,14 @@ namespace JOIEnergy.Tests
                 new PricePlan() { PlanName = PRICE_PLAN_2_ID, UnitRate = 1, PeakTimeMultiplier = NoMultipliers() },
                 new PricePlan() { PlanName = PRICE_PLAN_3_ID, UnitRate = 2, PeakTimeMultiplier = NoMultipliers() } 
             };
-            var pricePlanService = new PricePlanService(pricePlans, meterReadingService);
+            
             var smartMeterToPricePlanAccounts = new Dictionary<string, string>
             {
                 { SMART_METER_ID, PRICE_PLAN_1_ID }
             };
             var accountService = new AccountService(smartMeterToPricePlanAccounts);
-            controller = new PricePlanComparatorController(pricePlanService, accountService);
+            this._pricePlanService = new PricePlanService(pricePlans, meterReadingService, accountService);
+            controller = new PricePlanComparatorController(_pricePlanService, accountService);
         }
 
         [Fact]
@@ -118,6 +121,12 @@ namespace JOIEnergy.Tests
         public void GivenNoMatchingMeterIdShouldReturnNotFound()
         {
             Assert.Equal(404, controller.CalculatedCostForEachPricePlan("not-found").StatusCode);
+        }
+
+        [Fact]
+        public void GivenNotFoundSmartMeterIdThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => _pricePlanService.GetConsumptionCostLastWeek(string.Empty));
         }
 
         private static List<PeakTimeMultiplier> NoMultipliers()

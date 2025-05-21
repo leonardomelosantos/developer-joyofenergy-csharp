@@ -2,6 +2,9 @@
 
 namespace JOIEnergy.Domain
 {
+    /// <summary>
+    /// Classe utilitária que foi fornecida para ajudar na geração de intervalos de leitura de energia elétrica.
+    /// </summary>
     public class ElectricityReadingInterval
     {
         public readonly DateTime Start;
