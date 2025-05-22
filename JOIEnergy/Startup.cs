@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using JOIEnergy.Extensions;
 
 namespace JOIEnergy
 {
@@ -59,6 +60,7 @@ namespace JOIEnergy
             services.AddSingleton((IServiceProvider arg) => readings);
             services.AddSingleton((IServiceProvider arg) => pricePlans);
             services.AddSingleton((IServiceProvider arg) => SmartMeterToPricePlanAccounts);
+            services.AddSwaggerGenWithAuth();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,9 +69,16 @@ namespace JOIEnergy
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                AdicionarSwagger(app);
             }
 
             app.UseMvc();
+        }
+
+        private static void AdicionarSwagger(IApplicationBuilder app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
         private Dictionary<string, List<ElectricityReading>> GenerateMeterElectricityReadings() {
